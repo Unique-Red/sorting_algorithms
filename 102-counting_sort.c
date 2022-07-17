@@ -1,51 +1,75 @@
 #include "sort.h"
+
 /**
- *counting_sort- Sort an array of integers using counting sort.
- *@array: Pointer to an array of integers.
- *@size: size of the array.
- *Return: NULL
- */
-void counting_sort(int *array, size_t size)
+* findmax - Finds the maximum value in an array
+* @array: array to find max value of
+* @size: Size of array
+* Return: Largest value
+*/
+
+int findmax(int *array, size_t size)
 {
-	size_t i;
-	int j;
-	int max = array[0];
-	int *output = malloc(sizeof(int) * size);
-	int *count = malloc(sizeof(int) * size + 400);
+	int i, max = 0;
 
-	if (output == NULL || count == NULL)
-		return;
-
-
-/*Store the count of each character*/
-	for (i = 0; array[i]; ++i)
-		++count[array[i]];
-/*Find the largest element in the array*/
-	for (i = 1; i < size; i++)
+	for (i = 0; i < (int)size; i++)
 	{
 		if (max < array[i])
-		{
 			max = array[i];
-		}
 	}
-/*Change count[i] so that  count[i] now contains actual position*/
-	for (j = 1; j <= (max + 1); ++j)
-	{
-		count[j] += count[j - 1];
-	}
-	print_array(count, (max + 1));
+	return (max);
+}
 
-/*Build the output array.*/
-	for (i = 0; array[i]; ++i)
+/**
+* count - Counts number of occurences of value in an array
+* @array: Array to count values of
+* @size: Size of array
+* @val: Value to count in the array
+* Return: Count of va
+*/
+
+int count(int *array, size_t size, int val)
+{
+	int c = 0, i;
+
+	for (i = 0; i < (int)size; i++)
 	{
-		output[count[array[i]] - 1] = array[i];
-		--count[array[i]];
+		if (array[i] == val)
+			c++;
 	}
-/*copy output array to array*/
-	for (i = 0; array[i]; ++i)
+	return (c);
+}
+
+/**
+* counting_sort - sorts array using counting algorithm
+* @array: Array to sort
+* @size: Size of array
+*/
+
+void counting_sort(int *array, size_t size)
+{
+	int max, *red, i, *output, j;
+
+	if (array == NULL || size < 2)
+		return;
+	max = findmax(array, size);
+	output = malloc(sizeof(int) * (int)size);
+	red = malloc(sizeof(int) * (max + 1));
+	if (red == NULL || output == NULL)
+		return;
+	for (i = j = 0; i < max + 1; i++)
 	{
+		j += count(array, size, i);
+		red[i] = j;
+	}
+	print_array(red, max + 1);
+	for (i = 0; i < (int)size; i++)
+	{
+		output[red[array[i]] - 1] = array[i];
+		red[array[i]] -= 1;
+	}
+	for (i = 0; i < (int)size; i++)
 		array[i] = output[i];
-	}
-	free(count);
+
 	free(output);
+	free(red);
 }
